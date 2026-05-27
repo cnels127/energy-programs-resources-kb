@@ -14,7 +14,7 @@ Each `.json` file has a companion `.js` file (e.g. `miso-reference-data.js`) tha
 | `spp-reference-data.json` | 475 KB | PNodes (1,583), buses (9,237), members (489), acronyms (181), glossary (413), gen info |
 | `ercot-reference-data.json` | 587 KB | Settlement points (1,105), buses (19,339), members (2,239), acronyms (268), glossary (384), gen info |
 | `pjm-reference-data.json` | 526 KB | Pricing nodes (14,386), glossary (164) |
-| `isone-reference-data.json` | 489 KB | Pricing locations (1,211), glossary (1,646), acronyms (617), gen info |
+| `isone-reference-data.json` | 440 KB | Pricing locations (1,211), glossary (1,077), acronyms (626), gen info |
 
 ## Schema Reference
 
@@ -82,9 +82,9 @@ Type indices: `0` = DRRAZ, `1` = EXT. NODE, `2` = HUB, `3` = HUB NODE, `4` = LOA
 
 **`nodes.types`** — `string[]` ordered type labels matching the type indices
 
-**`acronyms.data`** — `Record<string, string>` mapping acronym → full name (617 entries)
+**`acronyms.data`** — `Record<string, string>` mapping acronym → full name (626 entries)
 
-**`glossary.data`** — `Record<string, { definition: string, ref: string, term?: string }>` (1,646 entries, keyed by lowercase term; multi-meaning terms have definitions joined with ` | `)
+**`glossary.data`** — `Record<string, { definition: string, ref: string, term?: string }>` (1,077 entries, keyed by lowercase term; acronym cross-references merged with their full definitions)
 
 **`genInfo`** — Nested structure object (region, pricing nodes section)
 
