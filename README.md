@@ -4,6 +4,8 @@ Externalized reference data for the Energy Programs & Resources application (v1.
 
 These JSON files contain large, relatively static datasets (glossaries, node/bus lists, market participants, etc.) that were previously embedded inline in the single-file HTML application. Externalizing them reduces the HTML file from **~2.0 MB → ~700 KB** (a 66% reduction).
 
+Each `.json` file has a companion `.js` file (e.g. `miso-reference-data.js`) that wraps the same data as `window._refData_<rto> = {...};` for loading via synchronous `<script>` tags.
+
 ## Files
 
 | File | Size (min) | Contents |
@@ -11,10 +13,8 @@ These JSON files contain large, relatively static datasets (glossaries, node/bus
 | `miso-reference-data.json` | 186 KB | Nodes (2,596), acronyms (352), glossary (208), company registry (60), gen info, resources (13) |
 | `spp-reference-data.json` | 475 KB | PNodes (1,583), buses (9,237), members (489), acronyms (181), glossary (413), gen info |
 | `ercot-reference-data.json` | 587 KB | Settlement points (1,105), buses (19,339), members (2,239), acronyms (268), glossary (384), gen info |
-| `pjm-reference-data.json` | 37 KB | Glossary (164) |
-| `isone-reference-data.json` | 7 KB | Gen info |
-
-Pretty-printed versions are in `pretty/` for readability in PRs and diffs.
+| `pjm-reference-data.json` | 526 KB | Pricing nodes (14,386), glossary (164) |
+| `isone-reference-data.json` | 45 KB | Pricing locations (1,211), gen info |
 
 ## Schema Reference
 
@@ -66,50 +66,51 @@ Type codes: `1` = Hub, `2` = ResourceNode_Gen, `3` = ResourceNode_Load, `7` = Pr
 
 ### PJM
 
+**`nodes.data`** — `Array<[pnodeId: number, pnodeName: string, typeIndex: number, zone: string]>`
+
+Type indices: `0` = AGGREGATE, `1` = EHV, `2` = EXT, `3` = GEN, `4` = HUB, `5` = INTERFACE, `6` = LOAD, `7` = RESIDUAL_METERED_EDC, `8` = ZONE
+
+**`nodes.types`** — `string[]` ordered type labels matching the type indices
+
 **`glossary.data`** — `Record<string, { definition: string, ref: string, term?: string }>`
 
 ### ISO-NE
 
-**`genInfo`** — Nested structure object (hubs, zones, etc.)
+**`nodes.data`** — `Array<[locationId: number, locationName: string, typeIndex: number]>`
+
+Type indices: `0` = DRRAZ, `1` = EXT. NODE, `2` = HUB, `3` = HUB NODE, `4` = LOAD ZONE, `5` = NETWORK NODE
+
+**`nodes.types`** — `string[]` ordered type labels matching the type indices
+
+**`genInfo`** — Nested structure object (region, pricing nodes section)
 
 ## Loading in the HTML App
 
-The HTML file loads these via `fetch()` at startup. Example integration pattern:
+The HTML file loads data via synchronous XHR in a `<script>` tag in the `<head>`, which sets `window._refData_*` globals before the Babel/React app code executes. Each variable declaration reads from these globals inline:
 
 ```javascript
-// Configuration — set to your GitHub raw URL or CDN
-var DATA_BASE_URL = 'https://raw.githubusercontent.com/your-org/repo/main/reference-data/';
+// In <head> — synchronous XHR loader
+(function() {
+  var base = 'https://raw.githubusercontent.com/cnels127/energy-programs-resources-kb/refs/heads/main/';
+  var files = ['miso','spp','ercot','pjm','isone'];
+  files.forEach(function(rto) {
+    try {
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET', base + rto + '-reference-data.json', false);
+      xhr.overrideMimeType('application/json');
+      xhr.send();
+      if (xhr.status === 200) {
+        window['_refData_' + rto] = JSON.parse(xhr.responseText);
+      }
+    } catch(e) { /* falls through to empty stubs */ }
+  });
+})();
 
-// Async loader with fallback
-async function loadReferenceData(rto) {
-  try {
-    const resp = await fetch(DATA_BASE_URL + rto + '-reference-data.json');
-    if (!resp.ok) throw new Error(resp.status);
-    return await resp.json();
-  } catch (e) {
-    console.warn('Failed to load ' + rto + ' data:', e);
-    return null;
-  }
-}
-
-// On app init, load all RTOs in parallel
-Promise.all([
-  loadReferenceData('miso'),
-  loadReferenceData('spp'),
-  loadReferenceData('ercot'),
-  loadReferenceData('pjm'),
-  loadReferenceData('isone')
-]).then(function([miso, spp, ercot, pjm, isone]) {
-  if (miso) {
-    MISO_NODES = miso.nodes.data;
-    MISO_ACRONYMS = miso.acronyms.data;
-    ACRONYM_DEFS = miso.glossary.data;
-    COMPANY_REG = miso.companyRegistry.data;
-    MISO_GEN_INFO = miso.genInfo;
-    MISO_RESOURCES = miso.resources;
-  }
-  // ... etc for other RTOs
-});
+// In the app code — inline assignment at declaration
+var MISO_NODES = (window._refData_miso && window._refData_miso.nodes.data) || [];
+var PJM_NODES = (window._refData_pjm && window._refData_pjm.nodes.data) || [];
+var ISONE_NODES = (window._refData_isone && window._refData_isone.nodes.data) || [];
+// ... etc
 ```
 
 ## Database Migration
@@ -128,6 +129,8 @@ These JSON files are structured for straightforward database import. Each top-le
 | `ercot.members.data` | `ercot_members` | `(name, short)` |
 | `spp.members.data` | `spp_members` | `name` |
 | `miso.companyRegistry.data` | `miso_companies` | `code` |
+| `pjm.nodes.data` | `pjm_nodes` | `pnode_id` |
+| `isone.nodes.data` | `isone_nodes` | `location_id` |
 
 ## Versioning
 
