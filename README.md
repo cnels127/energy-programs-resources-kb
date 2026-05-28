@@ -15,6 +15,7 @@ Each `.json` file has a companion `.js` file (e.g. `miso-reference-data.js`) tha
 | `ercot-reference-data.json` | 587 KB | Settlement points (1,105), buses (19,339), members (2,239), acronyms (268), glossary (384), gen info |
 | `pjm-reference-data.json` | 526 KB | Pricing nodes (14,386), glossary (164) |
 | `isone-reference-data.json` | 546 KB | Pricing locations (1,211), members (582), glossary (1,050), acronyms (626), gen info |
+| `caiso-reference-data.json` | 554 KB | Glossary (1,746), acronyms (623) |
 
 ## Schema Reference
 
@@ -90,6 +91,12 @@ Type indices: `0` = DRRAZ, `1` = EXT. NODE, `2` = HUB, `3` = HUB NODE, `4` = LOA
 
 **`genInfo`** — Nested structure object (region, pricing nodes section)
 
+### CAISO
+
+**`acronyms.data`** — `Record<string, string>` mapping acronym → full name (623 entries)
+
+**`glossary.data`** — `Record<string, { definition: string, ref: string, term: string }>` (1,746 entries; keyed by acronym when available, otherwise by title-cased term)
+
 ## Loading in the HTML App
 
 The HTML file loads data via synchronous XHR in a `<script>` tag in the `<head>`, which sets `window._refData_*` globals before the Babel/React app code executes. Each variable declaration reads from these globals inline:
@@ -98,7 +105,7 @@ The HTML file loads data via synchronous XHR in a `<script>` tag in the `<head>`
 // In <head> — synchronous XHR loader
 (function() {
   var base = 'https://raw.githubusercontent.com/cnels127/energy-programs-resources-kb/refs/heads/main/';
-  var files = ['miso','spp','ercot','pjm','isone'];
+  var files = ['miso','spp','ercot','pjm','isone','caiso'];
   files.forEach(function(rto) {
     try {
       var xhr = new XMLHttpRequest();
@@ -140,6 +147,8 @@ These JSON files are structured for straightforward database import. Each top-le
 | `isone.members.data` | `isone_members` | `id` |
 | `isone.acronyms.data` | `isone_acronyms` | `acronym` |
 | `isone.glossary.data` | `isone_glossary` | `term` |
+| `caiso.acronyms.data` | `caiso_acronyms` | `acronym` |
+| `caiso.glossary.data` | `caiso_glossary` | `term` |
 
 ## Versioning
 
