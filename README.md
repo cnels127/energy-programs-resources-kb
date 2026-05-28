@@ -1,6 +1,6 @@
 # Energy Programs & Resources — Reference Data
 
-Externalized reference data for the Energy Programs & Resources application (v1.2.6).
+Externalized reference data for the Energy Programs & Resources application (v1.2.5).
 
 These JSON files contain large, relatively static datasets (glossaries, node/bus lists, market participants, etc.) that were previously embedded inline in the single-file HTML application. Externalizing them reduces the HTML file from **~2.0 MB → ~821 KB**.
 
@@ -16,7 +16,7 @@ Each `.json` file has a companion `.js` file (e.g. `miso-reference-data.js`) tha
 | `pjm-reference-data.json` | 526 KB | Pricing nodes (14,386), glossary (164) |
 | `isone-reference-data.json` | 346 KB | Pricing locations (1,211), acronyms (626), glossary (1,050), members (582), gen info |
 | `caiso-reference-data.json` | 585 KB | Acronyms (623), glossary (1,746), members (376) |
-| `nyiso-reference-data.json` | 65 KB | Generator nodes (747), transmission nodes (144), load zones (11), acronyms (379), glossary (379) |
+| `nyiso-reference-data.json` | 79 KB | Generator nodes (747), transmission nodes (144), load zones (11), acronyms (379), glossary (379), market participants (440) |
 
 ## Loading
 
@@ -76,6 +76,6 @@ Each file is assigned to `window._refData_{rto}` and accessed via deep property 
 
 ## Version History
 
-- **v1.2.6** — Added `nyiso-reference-data.json`: generator nodes (747), transmission nodes (144), load zones (11), acronyms (379), glossary (379). Glossary merged from NYISO Acronyms PDF (338 entries) + 2003 PRL Evaluation (41 unique additions)
+- **v1.2.5** — Added `nyiso-reference-data.json`: generator nodes (747), transmission nodes (144), load zones (11), acronyms (379), glossary (379). Glossary merged from NYISO Acronyms PDF (338 entries) + 2003 PRL Evaluation (41 unique additions)
 - **v1.2.5** — Added `caiso-reference-data.json` (585 KB): glossary, acronyms, members. Updated `isone-reference-data.json` with glossary (1,050), acronyms (626), members (582), pricing locations (1,211)
 - **v1.2.4** — Initial externalization: miso, spp, ercot, pjm, isone reference data files
