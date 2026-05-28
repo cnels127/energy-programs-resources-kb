@@ -1,8 +1,8 @@
 # Energy Programs & Resources — Reference Data
 
-Externalized reference data for the Energy Programs & Resources application (v1.2.5).
+Externalized reference data for the Energy Programs & Resources application (v1.2.6).
 
-These JSON files contain large, relatively static datasets (glossaries, node/bus lists, market participants, etc.) that were previously embedded inline in the single-file HTML application. Externalizing them reduces the HTML file from **~2.0 MB → ~700 KB** (a 66% reduction).
+These JSON files contain large, relatively static datasets (glossaries, node/bus lists, market participants, etc.) that were previously embedded inline in the single-file HTML application. Externalizing them reduces the HTML file from **~2.0 MB → ~821 KB**.
 
 Each `.json` file has a companion `.js` file (e.g. `miso-reference-data.js`) that wraps the same data as `window._refData_<rto> = {...};` for loading via synchronous `<script>` tags.
 
@@ -14,145 +14,68 @@ Each `.json` file has a companion `.js` file (e.g. `miso-reference-data.js`) tha
 | `spp-reference-data.json` | 475 KB | PNodes (1,583), buses (9,237), members (489), acronyms (181), glossary (413), gen info |
 | `ercot-reference-data.json` | 587 KB | Settlement points (1,105), buses (19,339), members (2,239), acronyms (268), glossary (384), gen info |
 | `pjm-reference-data.json` | 526 KB | Pricing nodes (14,386), glossary (164) |
-| `isone-reference-data.json` | 546 KB | Pricing locations (1,211), members (582), glossary (1,050), acronyms (626), gen info |
-| `caiso-reference-data.json` | 585 KB | Glossary (1,746), acronyms (623), members (376) |
+| `isone-reference-data.json` | 346 KB | Pricing locations (1,211), acronyms (626), glossary (1,050), members (582), gen info |
+| `caiso-reference-data.json` | 585 KB | Acronyms (623), glossary (1,746), members (376) |
+| `nyiso-reference-data.json` | 65 KB | Generator nodes (747), transmission nodes (144), load zones (11), acronyms (379), glossary (379) |
 
-## Schema Reference
+## Loading
 
-Each file has a `_meta` object with `rto`, `version`, `asOf`, and `description` fields. Data sections include a `_schema` string documenting the structure.
-
-### MISO
-
-**`nodes.data`** — `Array<[nodeName: string, nodeTypeIndex: number]>`
-
-Type indices: `0` = CPNode, `1` = Aggregate, `2` = Interface, `3` = Load
-
-**`acronyms.data`** — `Record<string, string>` mapping acronym → full name
-
-**`glossary.data`** — `Record<string, { definition: string, ref: string }>` (Module A / BPM definitions)
-
-**`companyRegistry.data`** — `Record<code, { name, cid, aliases, misoUrl, mapCenter, website, hifldName, ncrId, nercFunctions, ... }>`
-
-**`genInfo`** — Nested structure object (hubs, zones, LBAs, etc.)
-
-**`resources`** — `Array<{ full, badges, resQualKey, eligiblePrograms, ineligiblePrograms, ... }>`
-
-### SPP
-
-**`pnodes.data`** — `Array<[rtoZone: 0|1, pnodeName: string, busName: string]>`
-
-Zone `0` = SPP East (SWPP), `1` = SPP West (WACM/WAUW)
-
-**`buses.data`** — `Array<[rtoZone: 0|1, busName: string, area: string, station: string, kv: number|string, busType: string]>`
-
-**`members.data`** — `Array<{ name, subcat, roles: string[], status, mpType, code }>`
-
-**`acronyms.data`** — `Record<string, string>`
-
-**`glossary.data`** — `Record<string, { definition: string, ref: string, term?: string }>`
-
-### ERCOT
-
-**`settlementPoints.data`** — `Array<[spName: string, spTypeCode: number]>`
-
-Type codes: `1` = Hub, `2` = ResourceNode_Gen, `3` = ResourceNode_Load, `7` = PrivateUseNetwork_Gen, `8` = PrivateUseNetwork_Load, `9` = ResourceNode_Unit
-
-**`buses.data`** — `Array<[busName: string, busNumber: number, station: string, area: string, zone: string, kv: number, owner: string]>`
-
-**`members.data`** — `Array<{ name, short, subcat, roles: string[] }>`
-
-**`acronyms.data`** — `Record<string, string>`
-
-**`glossary.data`** — `Record<string, { definition: string, ref: string, term?: string }>`
-
-### PJM
-
-**`nodes.data`** — `Array<[pnodeId: number, pnodeName: string, typeIndex: number, zone: string]>`
-
-Type indices: `0` = AGGREGATE, `1` = EHV, `2` = EXT, `3` = GEN, `4` = HUB, `5` = INTERFACE, `6` = LOAD, `7` = RESIDUAL_METERED_EDC, `8` = ZONE
-
-**`nodes.types`** — `string[]` ordered type labels matching the type indices
-
-**`glossary.data`** — `Record<string, { definition: string, ref: string, term?: string }>`
-
-### ISO-NE
-
-**`nodes.data`** — `Array<[locationId: number, locationName: string, typeIndex: number]>`
-
-Type indices: `0` = DRRAZ, `1` = EXT. NODE, `2` = HUB, `3` = HUB NODE, `4` = LOAD ZONE, `5` = NETWORK NODE
-
-**`nodes.types`** — `string[]` ordered type labels matching the type indices
-
-**`members.data`** — `Array<{ name, id, status, sector, type, classification, roles: string[], voting }>` (582 NEPOOL participants)
-
-**`acronyms.data`** — `Record<string, string>` mapping acronym → full name (626 entries)
-
-**`glossary.data`** — `Record<string, { definition: string, ref: string, term?: string }>` (1,050 entries; keyed by acronym when available, otherwise by title-cased term — matching SPP/ERCOT/PJM pattern)
-
-**`genInfo`** — Nested structure object (region, pricing nodes section)
-
-### CAISO
-
-**`acronyms.data`** — `Record<string, string>` mapping acronym → full name (623 entries)
-
-**`glossary.data`** — `Record<string, { definition: string, ref: string, term: string }>` (1,746 entries; keyed by acronym when available, otherwise by title-cased term)
-
-**`members.data`** — `Array<{ name, code, roles: string[] }>` (376 entities). Roles: SC (CAISO Scheduling Coordinator), WEIM SC (Western EIM SC), CRR (CRR Holder), CB (Convergence Bidding), EDAM SC (EDAM SC), PTO (Participating Transmission Owner — 23 entities per CAISO PTO list), DRP (Demand Response Provider), LSE (Load Serving Entity), UDC (Utility Distribution Company)
-
-## Loading in the HTML App
-
-The HTML file loads data via synchronous XHR in a `<script>` tag in the `<head>`, which sets `window._refData_*` globals before the Babel/React app code executes. Each variable declaration reads from these globals inline:
+The HTML application loads all files synchronously at startup via XHR from `raw.githubusercontent.com`:
 
 ```javascript
-// In <head> — synchronous XHR loader
-(function() {
-  var base = 'https://raw.githubusercontent.com/cnels127/energy-programs-resources-kb/refs/heads/main/';
-  var files = ['miso','spp','ercot','pjm','isone','caiso'];
-  files.forEach(function(rto) {
-    try {
-      var xhr = new XMLHttpRequest();
-      xhr.open('GET', base + rto + '-reference-data.json', false);
-      xhr.overrideMimeType('application/json');
-      xhr.send();
-      if (xhr.status === 200) {
-        window['_refData_' + rto] = JSON.parse(xhr.responseText);
-      }
-    } catch(e) { /* falls through to empty stubs */ }
-  });
-})();
-
-// In the app code — inline assignment at declaration
-var MISO_NODES = (window._refData_miso && window._refData_miso.nodes.data) || [];
-var PJM_NODES = (window._refData_pjm && window._refData_pjm.nodes.data) || [];
-var ISONE_NODES = (window._refData_isone && window._refData_isone.nodes.data) || [];
-// ... etc
+var base = 'https://raw.githubusercontent.com/cnels127/energy-programs-resources-kb/refs/heads/main/';
+var files = ['miso','spp','ercot','pjm','isone','caiso','nyiso'];
+files.forEach(function(rto) {
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', base + rto + '-reference-data.json', false);
+  xhr.overrideMimeType('application/json');
+  xhr.send();
+  if (xhr.status === 200) window['_refData_' + rto] = JSON.parse(xhr.responseText);
+});
 ```
 
-## Database Migration
+Each file is assigned to `window._refData_{rto}` and accessed via deep property chains with null guards.
 
-These JSON files are structured for straightforward database import. Each top-level key maps to a table or collection:
+## Schema Reference — NYISO
 
-| JSON Key | Suggested Table | Primary Key |
-|----------|----------------|-------------|
-| `*.acronyms.data` | `acronyms` | `(rto, acronym)` |
-| `*.glossary.data` | `glossary_terms` | `(rto, term)` |
-| `miso.nodes.data` | `miso_nodes` | `node_name` |
-| `spp.pnodes.data` | `spp_pnodes` | `pnode_name` |
-| `spp.buses.data` | `spp_buses` | `bus_name` |
-| `ercot.settlementPoints.data` | `ercot_settlement_points` | `sp_name` |
-| `ercot.buses.data` | `ercot_buses` | `bus_name` |
-| `ercot.members.data` | `ercot_members` | `(name, short)` |
-| `spp.members.data` | `spp_members` | `name` |
-| `miso.companyRegistry.data` | `miso_companies` | `code` |
-| `pjm.nodes.data` | `pjm_nodes` | `pnode_id` |
-| `isone.nodes.data` | `isone_nodes` | `location_id` |
-| `isone.members.data` | `isone_members` | `id` |
-| `isone.acronyms.data` | `isone_acronyms` | `acronym` |
-| `isone.glossary.data` | `isone_glossary` | `term` |
-| `caiso.acronyms.data` | `caiso_acronyms` | `acronym` |
-| `caiso.glossary.data` | `caiso_glossary` | `term` |
-| `caiso.members.data` | `caiso_members` | `code` |
+### `nyiso-reference-data.json`
 
-## Versioning
+```
+{
+  "genNodes": [[name, ptid], ...],                        // 747 generator nodes
+  "transNodes": [[name, ptid, to, zone, subzone], ...],   // 144 transmission nodes
+  "loadZones": [[name, ptid], ...],                       // 11 load zone PTIDs
+  "acronyms": { "data": { "ACR": "Full Name", ... } },   // 379 acronyms
+  "glossary": { "data": { "ACR": { "definition": "Full Name", "ref": "" }, ... } },  // 379 entries
+  "asOf": "05/28/2026",
+  "sources": { ... }
+}
+```
 
-The `_meta.version` field tracks which app version the data was exported from. The `_meta.asOf` date indicates the data snapshot date. Update both when refreshing data.
+**Generator Nodes** (`genNodes`): `[0]` = node name, `[1]` = PTID
+
+**Transmission Nodes** (`transNodes`): `[0]` = node name, `[1]` = PTID, `[2]` = TO, `[3]` = zone letter (A–K), `[4]` = subzone name
+
+**Load Zones** (`loadZones`): `[0]` = zone abbreviation (e.g., "CAPITL"), `[1]` = PTID
+
+**Acronyms** (`acronyms.data`): `Record<string, string>` — acronym → full name (379 entries merged from NYISO Acronyms PDF + 2003 PRL Evaluation glossary)
+
+**Glossary** (`glossary.data`): `Record<string, {definition, ref}>` — keyed by acronym, matching rendering pattern of other RTOs
+
+**Zone mapping**: A=West, B=Genesee, C=Central, D=North, E=Mohawk Valley, F=Capital, G=Hudson Valley, H=Millwood, I=Dunwoodie, J=New York City, K=Long Island
+
+### Database Migration Mapping
+
+| JSON Path | Table | PK | Notes |
+|-----------|-------|----|-------|
+| `nyiso.genNodes` | `nyiso_gen_nodes` | `ptid` | 747 generator nodes |
+| `nyiso.transNodes` | `nyiso_trans_nodes` | `ptid + name` | 144 transmission nodes |
+| `nyiso.loadZones` | `nyiso_load_zones` | `ptid` | 11 load zones |
+| `nyiso.acronyms.data` | `nyiso_acronyms` | `acronym` | 379 acronym mappings |
+| `nyiso.glossary.data` | `nyiso_glossary` | `term` | 379 glossary entries |
+
+## Version History
+
+- **v1.2.6** — Added `nyiso-reference-data.json`: generator nodes (747), transmission nodes (144), load zones (11), acronyms (379), glossary (379). Glossary merged from NYISO Acronyms PDF (338 entries) + 2003 PRL Evaluation (41 unique additions)
+- **v1.2.5** — Added `caiso-reference-data.json` (585 KB): glossary, acronyms, members. Updated `isone-reference-data.json` with glossary (1,050), acronyms (626), members (582), pricing locations (1,211)
+- **v1.2.4** — Initial externalization: miso, spp, ercot, pjm, isone reference data files
