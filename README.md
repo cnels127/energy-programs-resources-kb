@@ -1,6 +1,6 @@
 # Energy Programs & Resources — Reference Data
 
-Externalized reference data for the Energy Programs & Resources application (v1.2.4).
+Externalized reference data for the Energy Programs & Resources application (v1.2.5).
 
 These JSON files contain large, relatively static datasets (glossaries, node/bus lists, market participants, etc.) that were previously embedded inline in the single-file HTML application. Externalizing them reduces the HTML file from **~2.0 MB → ~700 KB** (a 66% reduction).
 
